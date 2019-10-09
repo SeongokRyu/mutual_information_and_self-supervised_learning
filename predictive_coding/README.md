@@ -6,4 +6,5 @@ This repository provides codes reproducing two papers, "[Representation learning
 
 ![](predictive_coding.jpg)
 
-As shown in the above figure, the two moduels -- the convolutional encoder and the GRU-RNN -- produce $$z_t$$ and $$c_t$$, respectively. 
+As shown in the above figure, the convolutional encoder and the GRU-RNN blocks produce ![](http://www.sciweavers.org/upload/Tex2Img_1570607635/eqn.png) and $$c_t$$, respectively. 
+
