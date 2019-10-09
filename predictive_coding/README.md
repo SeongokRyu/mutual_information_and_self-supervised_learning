@@ -7,6 +7,9 @@ This personal project aims to show
 * Comparison of the classification accuracy of supervised learning and semi-supervised learning results. 
 * Comparison of the methods enforcing 1-Lipschitz continuity: spectral normalization and gradient penalty methods. 
 
+## How to use
+_"Placeholder -- will be updated as soon as possible"
+
 ## Methodology
 
 ![](predictive_coding.jpg)
