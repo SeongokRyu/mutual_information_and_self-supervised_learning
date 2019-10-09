@@ -1,2 +1,2 @@
-# mutual_information_and_self-supervised_learning
+# Mutual Information and Self-supervised Learning
 Notes and tutorials on "Mutual information and self-supervised learning"
