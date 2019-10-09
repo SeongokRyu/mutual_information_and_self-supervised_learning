@@ -38,4 +38,5 @@ As shown in the above figure,
 * Supervised learning of speaker and gender classifications 
 * Pre-training baseline models by self-supervised learning
 * Fine-tuning the pre-trained networks on the down-stream tasks.
+* Applying the methods to the other domain data, such as medical data.
 
