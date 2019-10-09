@@ -30,7 +30,7 @@ As shown in the above figure,
 
 * The idea is to predict the local representation vector of the k-th future step ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) with the global representation vector ![](http://www.sciweavers.org/upload/Tex2Img_1570607691/eqn.png), by distinguishing the positive sample ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) from the set of negative samples ![](http://www.sciweavers.org/upload/Tex2Img_1570610352/eqn.png). 
 
-* In order to implement the infoNCE loss, the negative samples can be obtained by the shuffling ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) along to the batch axis. 
+* In order to compute the infoNCE loss, the negative samples should be obtained and we shuffle the local represenation vector ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) along to the batch axis for the purpose. 
 
 ## Results
 
