@@ -25,7 +25,7 @@ As shown in the above figure,
 
 * This model aims to learn both local and global representations (latent vectors) by minimizing so-called the infoNCE loss ![](http://www.sciweavers.org/upload/Tex2Img_1570608606/eqn.png). 
 
-* The idea is to predict the local representation vector of the k-th future step ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) with the global representation vector ![](http://www.sciweavers.org/upload/Tex2Img_1570607691/eqn.png), by distinguishing the positive sample ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) from the negative samples ![](http://www.sciweavers.org/upload/Tex2Img_1570608888/eqn.png). 
+* The idea is to predict the local representation vector of the k-th future step ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) with the global representation vector ![](http://www.sciweavers.org/upload/Tex2Img_1570607691/eqn.png), by distinguishing the positive sample ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) from the set of negative samples ![](http://www.sciweavers.org/upload/Tex2Img_1570610352/eqn.png). 
 
 * In order to implement the infoNCE loss, the negative sample can be obtained by the shuffling ![](http://www.sciweavers.org/upload/Tex2Img_1570608830/eqn.png) along to the batch axis. 
 
