@@ -8,7 +8,7 @@ This personal project aims to show
 * Comparison of the methods enforcing 1-Lipschitz continuity: spectral normalization and gradient penalty methods. 
 
 ## How to use
-_"Placeholder -- will be updated as soon as possible"
+*Placeholder -- will be updated as soon as possible*
 
 ## Methodology
 
