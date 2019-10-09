@@ -1,6 +1,6 @@
 # Representation learning by predictive coding
 
-This repository provides codes reproducing "Representation learning by contrastive predictive coding" and "Wasserstein dependency measure for representation learning". 
+This repository provides codes reproducing "Representation learning by contrastive predictive coding (https://arxiv.org/abs/1807.03748) " and "Wasserstein dependency measure for representation learning". 
 
 ### Overall scheme
 
