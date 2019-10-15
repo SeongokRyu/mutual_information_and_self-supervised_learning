@@ -12,4 +12,5 @@ This personal project aims to show
 
 ## Method and Experiments
 Please see the summary note named 'predictive_coding_note.ipynb'.
+
 \* Note: the summary notebook file cannot be opened directly. Thus, please go to the [this link](https://nbviewer.jupyter.org/github/SeongokRyu/mutual_information_and_self-supervised_learning/blob/master/predictive_coding/predictive_coding_note.ipynb).
