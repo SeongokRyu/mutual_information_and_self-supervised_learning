@@ -10,8 +10,7 @@ from libs.dataset import read_file_list
 from libs.dataset import read_speech_file
 from libs.dataset import read_splited_speech_file
 
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
@@ -60,14 +59,19 @@ def train(sess, ops_dict):
     if FLAGS.use_lipschitz:
         method = 'WPC'
     model_name += '_' + method
+    model_name += '_re'
 
     train_file_list = read_splited_speech_file(FLAGS.path, train_or_test='train')
     #test_file_list = read_splited_speech_file(FLAGS.path, train_or_test='test')
 
     saver = tf.train.Saver()
     ckpt_path = './save/'+model_name+'.ckpt'
+    if FLAGS.last_ckpt != -1:
+        saver.restore(sess, ckpt_path+'-'+str(FLAGS.last_ckpt))
+        print ("Restart training by reloading the", FLAGS.last_ckpt, "-th ckpt file")
+
     final_epoch = 0
-    for epoch in range(FLAGS.num_epoches):
+    for epoch in range(FLAGS.last_ckpt+1, FLAGS.num_epoches):
         print (epoch, "-th epoch")
         st = time.time()
 
@@ -125,5 +129,6 @@ if __name__ == '__main__':
     flags.DEFINE_integer('num_epoches', 30, 'numer of future steps to predict')
     flags.DEFINE_bool('use_lipschitz', False, 'Whether to enforce 1-Lipscthiz condition')
     flags.DEFINE_bool('save_model', True, 'Whether to save models during training procedures')
+    flags.DEFINE_integer('last_ckpt', -1, 'the index of last checkpoint file, if it exists')
 
     main()

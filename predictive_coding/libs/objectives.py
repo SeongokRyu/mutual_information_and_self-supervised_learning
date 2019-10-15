@@ -3,31 +3,34 @@ import tensorflow as tf
 def info_nce(w_obj, z, context, future_step, num_future_steps=12):
     z_future = z[:, future_step:-(num_future_steps-future_step+1), :] # [B, T, F2]
     c_present = context[:, :-num_future_steps-1, :]  # [B, T, F1]
-    c_present = tf.matmul(c_present, w_obj)
 
-    # Shape of z_future : [bs, num_t, num_f]
-    shape = tf.shape(z_future)
-    bs = shape[0]
-    num_t = shape[1]
-    dim_z = shape[2]
-    dim_c = tf.shape(c_present)[2]
+    # For a joint distribution on local and global representations
+    joint = tf.matmul(c_present, w_obj)
+    joint = tf.reduce_sum(tf.multiply(joint, z_future), axis=-1)
+    joint = tf.reduce_mean(joint)
+    
+    # For marginal distributions of the above joint distribution
+    bs = tf.shape(z_future)[0]
+    indices = tf.random.shuffle(tf.range(bs))
 
-    z_p = tf.transpose(z_future, [0,2,1])
-    c_p = tf.transpose(c_present, [0,2,1])
+    c_n = tf.expand_dims(c_present, axis=1) 
+    c_n = tf.tile(c_n, [1, bs, 1, 1])
+    z_n = tf.expand_dims(z_future, axis=1)
+    z_n = tf.tile(z_n, [1, bs, 1, 1])
+    z_n = tf.transpose(tf.gather(z_n, indices), [1,0,2,3])
 
-    z_n = tf.reshape(z_p, [-1, num_t])
-    c_n = tf.reshape(c_p, [-1, num_t])
+    c_n = tf.matmul(c_n, w_obj)
+    marginal = tf.reduce_sum(tf.multiply(c_n, z_n), axis=3)
+    #marginal = tf.log(tf.reduce_sum(tf.exp(marginal), axis=1)+1e-5)
+    marginal = tf.reduce_logsumexp(marginal, axis=1)
+    marginal = tf.reduce_mean(marginal)
 
-    u_p = tf.matmul(z_p, c_present)
-    u_p = tf.expand_dims(u_p, axis=2)
-    u_n = tf.matmul(c_n, z_n, transpose_b=True)
-    u_n = tf.reshape(u_n, [bs, dim_c, bs, dim_z])
-    #u_n = tf.transpose(u_n, [0,2,3,1])
+    del z_future
+    del c_present
+    del c_n
+    del z_n
 
-    pred_lgt = tf.concat([u_p, u_n], axis=2)
-    pred_log = tf.nn.log_softmax(pred_lgt, axis=2)
-    obj = tf.reduce_mean(pred_log[:,:,0])
-    return tf.expand_dims(obj, axis=-1)
+    return tf.expand_dims(joint-marginal, axis=-1)
 
 def binary_ce_loss(labels, logits):
     labels = tf.cast(labels, tf.float32)

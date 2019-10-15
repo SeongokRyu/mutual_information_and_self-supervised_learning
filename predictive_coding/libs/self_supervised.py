@@ -50,6 +50,7 @@ class SelfSupervised():
                     w_obj = spectral_normalization(w_obj, 1, j) 
                 w_obj_list.append(w_obj)    
 
+        var_total = tf.trainable_variables()
         obj_list = []
         for j in range(self.num_future_steps):
             obj = info_nce(w_obj_list[j], z, context, j+1, self.num_future_steps)

@@ -11,9 +11,9 @@ from libs.dataset import read_speech_file
 from libs.dataset import read_labels_txt
 from libs.dataset import read_splited_speech_file
 from libs.dataset import get_speaker_label
+from sklearn.metrics import accuracy_score
 
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
@@ -62,7 +62,7 @@ def train(sess, ops_dict):
             if FLAGS.task=='speaker':
                 pred_batch = np.argmax(pred_batch, axis=1)
             y_true_total = np.concatenate((y_true_total, y_batch), axis=0)
-            y_pred_total = np.concatenate((y_true_total, pred_batch), axis=0)
+            y_pred_total = np.concatenate((y_pred_total, pred_batch), axis=0)
 
             total_loss += loss
 
@@ -70,38 +70,54 @@ def train(sess, ops_dict):
         print ("Finish a single iteration, Total training loss of the entire batch:", total_loss)
         return total_loss, y_true_total, y_pred_total
 
+
+    random.seed(FLAGS.seed)
     total_st = time.time()
 
     model_name = 'LibriSpeech'
-    model_name += '_supervised' 
     model_name += '_' + FLAGS.task
+    model_name += '_supervised' 
+    model_name += '_' + str(FLAGS.train_ratio)
+    model_name += '_' + str(FLAGS.seed)
 
     idx_gender_speaker = read_labels_txt(FLAGS.path)
     train_file_list = read_splited_speech_file(FLAGS.path, train_or_test='train')
     test_file_list = read_splited_speech_file(FLAGS.path, train_or_test='test')
 
+    random.shuffle(train_file_list)
+    num_train = int(FLAGS.train_ratio*len(train_file_list))
+    train_file_list = train_file_list[:num_train]
+
     saver = tf.train.Saver()
     ckpt_path = './save/'+model_name+'.ckpt'
+    if FLAGS.last_ckpt != -1:
+        saver.restore(sess, ckpt_path+'-'+str(FLAGS.last_ckpt))
+        print ("Restart training by reloading the", FLAGS.last_ckpt, "-th ckpt file")
+
     final_epoch = 0
-    for epoch in range(FLAGS.num_epoches):
+    for epoch in range(1, FLAGS.num_epoches+1):
         print (epoch, "-th epoch")
         st = time.time()
 
         random.shuffle(train_file_list)
 
-        # Training
         train_loss, label_train, pred_train = run_one_epoch(sess, ops_dict, train_file_list, 
                                                             idx_gender_speaker, True)
+        train_accuracy = accuracy_score(
+            label_train.astype(int), pred_train.astype(int))
+        print ("Train           Loss:", round(train_loss,3), \
+                            "\t Accuracy:", round(train_accuracy,3))
 
-        # Validation
-        #test_loss, label_test, pred_test = run_one_epoch(sess, ops_dict, test_file_list, 
-        #                                                 idx_gender_speaker, False)
+        if epoch%FLAGS.test_step == 0:
+            test_loss, label_test, pred_test = run_one_epoch(sess, ops_dict, test_file_list, 
+                                                             idx_gender_speaker, False)
+            test_accuracy = accuracy_score(
+                label_test.astype(int), pred_test.astype(int))
+            print ("Test            Loss:", round(test_loss,3), \
+                                "\t Accuracy:", round(test_accuracy,3))
 
-        # Print Results
         et = time.time()
         print ("Time for", epoch, "-th epoch: ", et-st)
-        print ("Loss        Train:", round(train_loss,3))
-              # "\t Test:", round(validation_loss,3))
 
         # Save network 
         if(FLAGS.save_model):
@@ -134,14 +150,17 @@ def main():
     return
 
 if __name__ == '__main__':
+    flags.DEFINE_integer('seed', 999, 'random seed')
     flags.DEFINE_string('path', './data/LibriSpeech/', '')
     flags.DEFINE_string('task', 'speaker', 'speaker or gender classification')
     flags.DEFINE_integer('window', 20480, 'Output dimension of a convolutional encoder')
     flags.DEFINE_integer('conv_dim', 512, 'Output dimension of a convolutional encoder')
     flags.DEFINE_integer('ar_dim', 256, 'Output dimension of a GRU-RNN')
     flags.DEFINE_float('init_lr', 2e-4, 'Initial learning rate')
+    flags.DEFINE_float('train_ratio', 1.0, 'the ratio of training data')
     flags.DEFINE_integer('batch_size', 16, 'Batch size')
     flags.DEFINE_integer('num_epoches', 100, 'numer of future steps to predict')
-    flags.DEFINE_bool('save_model', False, 'Whether to save models during training procedures')
+    flags.DEFINE_bool('save_model', True, 'Whether to save models during training procedures')
+    flags.DEFINE_integer('last_ckpt', -1, 'the index of last checkpoint file, if it exists')
 
     main()
